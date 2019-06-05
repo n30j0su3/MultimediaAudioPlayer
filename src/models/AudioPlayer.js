@@ -68,7 +68,7 @@ class AudioPlayer {
             pBar.style.width = `${progress}%`;
         }
     }
-    formatTime(seconds) {
+    _formatTime(seconds) {
         //var sec_num = parseInt(this, 10); // don't forget the second param
         var hours = Math.floor(seconds / 3600);
         var minutes = Math.floor((seconds - (hours * 3600)) / 60);
@@ -189,7 +189,7 @@ class AudioPlayer {
 
     _updateBasigGUIElement(el) {
         if (el.DOMElement instanceof HTMLElement) {
-            el.DOMElement.innerHTML = el.value;
+            el.DOMElement.innerHTML = this._formatTime(el.value);
         }
     }
 
