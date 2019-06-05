@@ -1,15 +1,12 @@
 class AudioPlayer {
 
     constructor(params) {
-        //The constructor initialit the class AudioPlayer with params
-        //By default it creates two arrays: songs and queue, also creates an object of type Audio
-        //and the local variable "src" starts with the song "1.mp3"
-        this.songs = [];
+
+        //this.songs = [];
         this.queue = [];
         this.player = new Audio();
         let src = "songs/1.mp3";
 
-        //Initialit the gui by default -- Prevents the undefined
         this._gui = {
             progressBar: { value: null, DOMElement: null },
             artistName: { value: null, DOMElement: null },
@@ -19,15 +16,11 @@ class AudioPlayer {
             albumCover: { value: null, DOMElement: null }
         };
 
-        //Check if params has gui to do the magic
         if (params.hasOwnProperty("gui")) {
-            //Validate if the "params" has "gui" and creates an object with the values
             var { progressBar, artistName, songName, currentTime, totalTime, albumCover } = params.gui;
-            //sends the object to the private function "_initGUI"
             this._initGUI(progressBar, artistName, songName, currentTime, totalTime, albumCover);
         }
 
-        //Initialit the buttons by default -- Prevents the undefined
         this._buttons = {
             queue: null,
             volume: null,
@@ -36,11 +29,9 @@ class AudioPlayer {
             next: null,
             add: null
         }
-
-        //Loads the song in the player
+        
         this._loadSong(src);
-
-        //Check if params has buttons to do the magic
+        
         if (params.hasOwnProperty("buttons")) {
             var { queue, volume, back, playPause, next, add } = params.buttons;
             this._initButtons(queue, volume, back, playPause, next, add);
@@ -50,34 +41,14 @@ class AudioPlayer {
 
     _loadSong(src) {
         this.player.src = src;
-        //console.log(_formatTime(src.totalTime));
         this.player.onloadedmetadata = () => {
             this.gui = {
                 totalTime: { value: this.player.duration, DOMElement: this.gui.totalTime.DOMElement },
-                currentTime: { value: this.player.currentTime, DOMElement: this.gui.currentTime.DOMElement }
+                currentTime: { value: 0, DOMElement: this.gui.currentTime.DOMElement }
             }
         }
-        this.player.ontimeupdate = () => {
-            //console.log(this.player.currentTime);
-            this.gui = {
-                currentTime: { value: this.player.currentTime, DOMElement: this.gui.currentTime.DOMElement }
-            }
-            var [totalTime, currentTime] = [this.gui.totalTime.value, this.gui.currentTime.value];
-            var progress = (currentTime / totalTime) * 100;
-            let pBar = this.gui.progressBar.DOMElement.querySelector("div");
-            pBar.style.width = `${progress}%`;
-        }
     }
-    formatTime(seconds) {
-        //var sec_num = parseInt(this, 10); // don't forget the second param
-        var hours = Math.floor(seconds / 3600);
-        var minutes = Math.floor((seconds - (hours * 3600)) / 60);
-        var seconds = Math.round(seconds - (hours * 3600) - (minutes * 60));
-        if (hours < 10) { hours = "0" + hours; }
-        if (minutes < 10) { minutes = "0" + minutes; }
-        if (seconds < 10) { seconds = "0" + seconds; }
-        return /*hours + ':' + */minutes + ':' + seconds;
-    }
+
     _initGUI(...params) {
         this.gui = {
             progressBar: params[0] || { value: null, DOMElement: null },
@@ -104,13 +75,6 @@ class AudioPlayer {
         //console.log(element);
         if (element instanceof HTMLElement) {
             element.onclick = callback;
-        } else {
-            if (element.hasOwnProperty("DOMElement")) {
-                element = element.DOMElement;
-                if (element instanceof HTMLElement) {
-                    element.onclick = callback;
-                }
-            }
         }
     }
 
@@ -132,11 +96,8 @@ class AudioPlayer {
             const key = keys[i];
             if (elements[key] != null) {
                 toAssign[key] = elements[key];
-                if (Object.keys(actions).length > 0) {
-                    if (actions.hasOwnProperty(key)) {
-                        console.log(key);
-                        this._addClickEvent(toAssign[key], actions[key]);
-                    }
+                if(Object.keys(actions).length > 0){
+                    this._addClickEvent(toAssign[key], actions[key]);
                 }
             }
         }
@@ -163,7 +124,7 @@ class AudioPlayer {
             add: () => false,
 
         }
-        this._assignValues(this._buttons, btns, actions);
+        this._assignValues(this._buttons,btns,actions);
     }
 
     get buttons() {
@@ -171,25 +132,9 @@ class AudioPlayer {
     }
 
     set gui(elments) {
-        let actions = {
-            progressBar: (e) => {
-                let x = e.offsetX;
-                let w = this.gui.progressBar.DOMElement.offsetWidth;
-                let newCurrentTime = this.gui.totalTime.value * (x/w);
-                this.player.currentTime = newCurrentTime;
-                this.gui = {
-                    currentTime: {value: newCurrentTime, DOMElement: this.gui.currentTime.DOMElement}
-                }
-            }
-        }
-        this._assignValues(this._gui, elments, actions);
-        this._updateBasigGUIElement(this.gui.totalTime);
-        this._updateBasigGUIElement(this.gui.currentTime);
-    }
-
-    _updateBasigGUIElement(el) {
-        if (el.DOMElement instanceof HTMLElement) {
-            el.DOMElement.innerHTML = el.value;
+        this._assignValues(this._gui, elments);
+        if(this._gui.totalTime.DOMElement instanceof HTMLElement){
+            this._gui.totalTime.DOMElement.innerHTML = this._gui.totalTime.value;
         }
     }
 
