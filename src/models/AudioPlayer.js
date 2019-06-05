@@ -189,6 +189,7 @@ class AudioPlayer {
 
     _updateBasigGUIElement(el) {
         if (el.DOMElement instanceof HTMLElement) {
+            //format time function
             el.DOMElement.innerHTML = this._formatTime(el.value);
         }
     }
